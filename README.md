@@ -12,7 +12,7 @@ Jason Kwong (@kwongjc)
 * bwa - [https://github.com/lh3/bwa](https://github.com/lh3/bwa)  
 * samtools - [https://github.com/samtools/samtools](https://github.com/samtools/samtools)  
 
-# Usage
+##Usage
 
 ```
 $ pilon-correct -h

@@ -1,0 +1,129 @@
+#!/bin/sh
+# Script by JK
+# Runs bwa mem to align and pilon to correct reads
+
+##################################
+
+# Functions
+
+function msg
+{
+	echo -e "$*"
+}
+
+function err
+{
+	echo "ERROR: $*" 1>&2
+	exit 1
+}
+
+function exitOnFailure
+{
+	if [ $1 -ne 0 ]; then
+		err "$2 failed to run (errorcode=$1)"
+	fi
+}
+
+function check
+{
+	if ! type "$*" > /dev/null; then
+		msg "Checking for $* ... "
+		err "Check $* is installed."
+	else
+		msg "Checking for $* ... [OK]"
+	fi
+}
+
+function banner
+{
+	msg "------------------------------"
+	msg "$*"
+	msg "------------------------------"
+}
+
+function version
+{
+	msg "$vers"
+	exit 0
+}
+
+function usage
+{
+	msg "Name:\n  pilon-correct"
+	msg "Corrects assemblies with Illumina reads"
+	msg "Author:\n  Jason Kwong <jason.kwong@unimelb.edu.au>"
+	msg "Usage:\n  pilon-correct [options] ref.fasta R1.fq.gz R2.fq.gz"
+	msg "Parameters:"
+	msg "  ref.fasta      Input genome to correct in FASTA format"
+	msg "Options:"
+	msg "  -h             Show this help"
+	msg "  -o PREFIX      Output prefix (default='pilon')"
+	msg "  -d FLOAT       Minimum evidence to call SNPs/indels (default=0.8)"
+	msg "  -t CPUS        Number of threads to be used (default=16)"
+	msg "  -v             Print version"
+	exit 0
+}
+
+##################################
+
+# Set default options
+out="pilon"
+depth="0.8"
+cpus=16
+vers="pilon-correct v0.1 - 25 Nov 2016"
+
+# Options
+while getopts "ho:d:t:v" opt; do
+	case $opt in
+		h)
+			usage ;;
+		o)
+			out=$OPTARG ;;
+		d)
+			depth=$OPTARG ;;
+		t)
+			cpus=$OPTARG ;;
+		v)
+			version ;;
+	esac
+done
+
+# skip over options to pass arguments
+shift $((OPTIND - 1))
+
+# read our mandatory positional parameters
+[[ $# -lt 1 ]] && usage
+[[ $# -gt 3 ]] && usage
+
+ref=$1
+R1=$2
+R2=$3
+
+##################################
+
+banner "$vers" 
+
+# Check dependencies
+banner "Checking dependencies ..."
+check "bwa"
+check "samtools"
+check "pilon"
+
+# Map Illumina short reads to ref
+banner "Running bwa ..."
+msg "bwa index $ref"
+bwa index $ref
+msg "bwa mem -t $cpus $ref $R1 $R2 | samtools sort > aln.bam"
+bwa mem -t $cpus $ref $R1 $R2 | samtools sort > aln.bam
+# Index BAM
+banner "Indexing BAM ..."
+msg "samtools index aln.bam"
+samtools index aln.bam
+msg "samtools faidx $ref"
+samtools faidx $ref
+# Call SNPs/indels with Pilon
+banner "Running pilon ..."
+msg "pilon --genome $ref --frags aln.bam --output $out --fix all --mindepth $depth --changes --verbose --threads $cpus"
+pilon --genome $ref --frags aln.bam --output $out --fix all --mindepth $depth --changes --verbose --threads $cpus
+banner "Done."
+exit 0

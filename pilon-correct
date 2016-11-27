@@ -58,7 +58,7 @@ function usage
 	msg "Options:"
 	msg "  -h             Show this help"
 	msg "  -o PREFIX      Output prefix (default='pilon')"
-	msg "  -d FLOAT       Minimum evidence to call SNPs/indels (default=0.8)"
+	msg "  -d FLOAT       Minimum evidence to call SNPs/indels (default=0.5)"
 	msg "  -t CPUS        Number of threads to be used (default=16)"
 	msg "  -v             Print version"
 	exit 0
@@ -68,7 +68,7 @@ function usage
 
 # Set default options
 out="pilon"
-depth="0.8"
+depth="0.5"
 cpus=16
 vers="pilon-correct v0.1 - 25 Nov 2016"
 

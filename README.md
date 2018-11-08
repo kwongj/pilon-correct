@@ -2,17 +2,17 @@
 
 Corrects PacBio assemblies using Illumina short-reads
 
-##Author
+## Author
 
 Jason Kwong (@kwongjc)
 
-##Dependencies
+## Dependencies
 
 * pilon - [https://github.com/broadinstitute/pilon](https://github.com/broadinstitute/pilon)  
 * bwa - [https://github.com/lh3/bwa](https://github.com/lh3/bwa)  
 * samtools - [https://github.com/samtools/samtools](https://github.com/samtools/samtools)  
 
-##Usage
+## Usage
 
 ```
 $ pilon-correct -h
@@ -33,10 +33,10 @@ Options:
   -v             Print version
 ```
 
-##Bugs
+## Bugs
 
 Please submit via the [GitHub issues page](https://github.com/kwongj/pilon-correct/issues).  
 
-##Software Licence
+## Software Licence
 
 [GPLv3](https://github.com/kwongj/pilon-correct/blob/master/LICENSE)
